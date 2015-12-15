@@ -343,6 +343,25 @@ namespace SimMatrix
             return Math.Sqrt(sum/count);
         }
 
+        private static double mae(double?[] a, double?[] b)
+        {
+            if (a.Length != b.Length)
+                return (-1);
+
+            double sum = 0;
+            int count = 0;
+            for (int i = 0; i < a.Length; i++)
+            {
+                if (a[i] != null && b[i] != null && !Double.IsNaN((double)a[i]) && !Double.IsNaN((double)b[i]))
+                {
+                    sum += Math.Abs((double)(a[i] - b[i]));
+                    count++;
+                }
+
+            }
+            return sum / count;
+        }
+
         private static double?[][] createCorrelationSimMatrix(int?[][] userItemMatrix)
         {
             int rows = userItemMatrix.Length;
@@ -442,9 +461,11 @@ namespace SimMatrix
             }
 
             double rmseVal = rmse(ratings, predictions);
+            double maeVal = mae(ratings, predictions);
 
             Console.WriteLine(info);
             Console.WriteLine(neigh + " neighbors userbased RMSE: "+rmseVal);
+            Console.WriteLine(neigh + " neighbors userbased MAE: " + maeVal);
         }
 
         private static void testItembasedMatrix(double?[][] simMatrix, int?[][] testMatrix, int?[][] trainMatrix, string info)
@@ -480,9 +501,11 @@ namespace SimMatrix
             }
 
             double rmseVal = rmse(ratings, predictions);
+            double maeVal = mae(ratings, predictions);
 
             Console.WriteLine(info);
             Console.WriteLine(neigh + " neighbors itembased RMSE: " + rmseVal);
+            Console.WriteLine(neigh + " neighbors itembased MAE: " + maeVal);
         }
 
         private static double? predictUserBased(int movieId, int userId, int neighbors, double?[][] simMatrix, int?[][] trainMatrix, double[] userAvgRatings)
@@ -568,8 +591,10 @@ namespace SimMatrix
             }
 
             double rmseVal = rmse(ratings, predictions);
+            double maeVal = mae(ratings, predictions);
 
-            Console.WriteLine("User-based baseline RMSE: " + rmseVal);
+            Console.WriteLine("Baseline userbased RMSE: " + rmseVal);
+            Console.WriteLine("Baseline userbased MAE: " + maeVal);
         }
 
         private static void baselineItemBased(double[] itemAvgRatings, int?[][] testMatrix)
@@ -585,10 +610,12 @@ namespace SimMatrix
                 ratings[i] = testRow[2];
                 predictions[i] = itemAvgRatings[(int)testRow[0] - 1];
             }
-
+            
             double rmseVal = rmse(ratings, predictions);
+            double maeVal = mae(ratings, predictions);
 
-            Console.WriteLine("Item-based baseline RMSE: " + rmseVal);
+            Console.WriteLine("Baseline itembased RMSE: " + rmseVal);
+            Console.WriteLine("Baseline itembased MAE: " + maeVal);
         }
 
         private static double[] createItemBasedBaseline(int?[][] matrix)
